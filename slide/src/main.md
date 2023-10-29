@@ -1,5 +1,5 @@
 ---
-title: Slide 模板
+title: 后缀数组与最长公共子串-算法设计与分析
 separator: <!--s-->
 verticalSeparator: <!--v-->
 theme: simple
@@ -16,11 +16,43 @@ revealOptions:
 <div class="middle center">
 <div style="width: 100%">
 
-# Slide 模版
+<img src="images/jiangnan_logo.png" style="margin-bottom: 1em" width="40%">
+
+# 后缀数组与最长公共子串
 
 <hr/>
 
-By [@TonyCrane](https://github.com/TonyCrane)
+2023 年人工智能与计算机学院「算法设计与分析」课程
+
+By 冯则涛、张帅宇、李伟、杨子伦、杨康
+
+<!-- ←/→ Space Home End 翻页 -->
+
+
+<div style="text-align: right; margin-top: 2em;">
+<p>2023.11.7&emsp;&emsp;&emsp;</p>
+</div>
+
+</div>
+</div>
+
+<!--v-->
+
+## 本节内容
+
+- 后缀数组
+- 最长公共前缀
+- 最长公共子串
+- 扩展
+
+<!--s-->
+
+<div class="middle center">
+<div style="width: 100%">
+
+## Reference
+
+
 
 </div>
 </div>
@@ -30,121 +62,11 @@ By [@TonyCrane](https://github.com/TonyCrane)
 <div class="middle center">
 <div style="width: 100%">
 
-# Part.1 大标题
-
-一些 markdown
-
-</div>
-</div>
-
-
-<!--v-->
-
-## 标题
-
-> test
+# 谢谢大家
 
 <hr/>
 
-```rust [1|2-3]
-fn main() {
-    println!("Hello World!")
-}
-```
-
-...
-
-- list 1
-- list 2
-    - list 2.1
-
-1. 有序
-
-<!--v-->
-
-## 标题
-
-<div class="three-line">
-
-|表头 a|表头 b|表头 c|
-|:--:|:--:|:--:|
-|这是一个|一些内容|...|
-|三线表|...|...|
-
-</div>
-
-|表头 a|表头 b|表头 c|
-|:--:|:--:|:--:|
-|这是一个|一些内容|...|
-|普通表格|...|...|
-
-<!--s-->
-
-<div class="middle center">
-<div style="width: 100%">
-
-# Part.2 布局
-
-</div>
-</div>
-
-<!--v-->
-
-## 多列布局
-
-<div class="mul-cols">
-<div class="col">
-
-第一列
-
-- list
-- list
-
-</div>
-<div class="col">
-
-第二列
-
-```python
-class MyClass:
-    def __init__(self, ...):
-        ...
-    def method(self, ...):
-        ...
-```
-
-</div>
-</div>
-
-<div class="mul-cols">
-<div class="col">
-
-第一列
-
-- list
-- list
-
-</div>
-<div class="col">
-
-第二列
-
-1. list 
-2. list 
-    - list
-
-</div>
-<div class="col">
-
-第三列
-
-```python
-class MyClass:
-    def __init__(self, ...):
-        ...
-    def method(self, ...):
-        ...
-```
+**Questions?**
 
 </div>
 </div>

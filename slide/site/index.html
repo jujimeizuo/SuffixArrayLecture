@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <title>Slide 模板</title>
+    <title>后缀数组与最长公共子串-算法设计与分析</title>
     <link rel="shortcut icon" href="./favicon.ico" />
     <link rel="stylesheet" href="./dist/reset.css" />
     <link rel="stylesheet" href="./dist/reveal.css" />
@@ -16,143 +16,65 @@
   </head>
   <body>
     <div class="reveal">
-      <div class="slides"><section  data-markdown><script type="text/template">
+      <div class="slides"><section ><section data-markdown><script type="text/template">
 
 <div class="middle center">
 <div style="width: 100%">
 
-# Slide 模版
+<img src="images/jiangnan_logo.png" style="margin-bottom: 1em" width="40%">
+
+# 后缀数组与最长公共子串
 
 <hr/>
 
-By [@TonyCrane](https://github.com/TonyCrane)
+2023 年人工智能与计算机学院「算法设计与分析」课程
+
+By 冯则涛、张帅宇、李伟、杨子伦、杨康
+
+<!-- ←/→ Space Home End 翻页 -->
+
+
+<div style="text-align: right; margin-top: 2em;">
+<p>2023.11.7&emsp;&emsp;&emsp;</p>
+</div>
 
 </div>
 </div>
 
-</script></section><section ><section data-markdown><script type="text/template">
+</script></section><section data-markdown><script type="text/template">
+
+## 本节内容
+
+- 后缀数组
+- 最长公共前缀
+- 最长公共子串
+- 扩展
+
+</script></section></section><section  data-markdown><script type="text/template">
 
 <div class="middle center">
 <div style="width: 100%">
 
-# Part.1 大标题
+## Reference
 
-一些 markdown
+
 
 </div>
 </div>
 
+</script></section><section  data-markdown><script type="text/template">
 
-</script></section><section data-markdown><script type="text/template">
+<div class="middle center">
+<div style="width: 100%">
 
-## 标题
-
-> test
+# 谢谢大家
 
 <hr/>
 
-```rust [1|2-3]
-fn main() {
-    println!("Hello World!")
-}
-```
-
-...
-
-- list 1
-- list 2
-    - list 2.1
-
-1. 有序
-
-</script></section><section data-markdown><script type="text/template">
-
-## 标题
-
-<div class="three-line">
-
-|表头 a|表头 b|表头 c|
-|:--:|:--:|:--:|
-|这是一个|一些内容|...|
-|三线表|...|...|
+**Questions?**
 
 </div>
-
-|表头 a|表头 b|表头 c|
-|:--:|:--:|:--:|
-|这是一个|一些内容|...|
-|普通表格|...|...|
-
-</script></section></section><section ><section data-markdown><script type="text/template">
-
-<div class="middle center">
-<div style="width: 100%">
-
-# Part.2 布局
-
-</div>
-</div>
-
-</script></section><section data-markdown><script type="text/template">
-
-## 多列布局
-
-<div class="mul-cols">
-<div class="col">
-
-第一列
-
-- list
-- list
-
-</div>
-<div class="col">
-
-第二列
-
-```python
-class MyClass:
-    def __init__(self, ...):
-        ...
-    def method(self, ...):
-        ...
-```
-
-</div>
-</div>
-
-<div class="mul-cols">
-<div class="col">
-
-第一列
-
-- list
-- list
-
-</div>
-<div class="col">
-
-第二列
-
-1. list 
-2. list 
-    - list
-
-</div>
-<div class="col">
-
-第三列
-
-```python
-class MyClass:
-    def __init__(self, ...):
-        ...
-    def method(self, ...):
-        ...
-```
-
-</div>
-</div></script></section></section></div>
+</div></script></section></div>
     </div>
 
     <script src="./dist/reveal.js"></script>
@@ -189,7 +111,7 @@ class MyClass:
           RevealHighlight,
           RevealZoom,
           RevealNotes,
-          RevealMath
+          RevealMath.KaTeX
         ]
       };
 
@@ -199,11 +121,22 @@ class MyClass:
       var options = extend(defaultOptions, {"transition":"slide","transitionSpeed":"fast","center":false,"slideNumber":"c/t","width":1000}, queryOptions);
     </script>
 
-    <script src="https://cdn.tonycrane.cc/heti/heti.js"></script>
+    <script src="https://cdn.jujimeizuo.cn/heti/heti.js"></script>
     <script src="./assets/heti_worker.js"></script>
 
     <script>
-      Reveal.initialize(options);
+      Reveal.initialize(options).then(() => {
+        document.querySelector(".backgrounds").setAttribute("style", document.querySelector(".slides").style.cssText);
+      });
+      Reveal.on('overviewshown', event => {
+        document.querySelector(".backgrounds").setAttribute("style", "");
+      });
+      Reveal.on('overviewhidden', event => {
+        document.querySelector(".backgrounds").setAttribute("style", document.querySelector(".slides").style.cssText);
+      });
+      Reveal.on('resize', event => {
+        document.querySelector(".backgrounds").setAttribute("style", document.querySelector(".slides").style.cssText);
+      });
     </script>
   </body>
 </html>
