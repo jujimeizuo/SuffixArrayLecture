@@ -20,6 +20,6 @@ jobs:
         source_file: 'slide/site/.'
         destination_repo: 'jujimeizuo/slides'
         destination_branch: 'master'
-        destination_folder: 'RevealmdTemplate'
+        destination_folder: 'SuffixArrayLecture'
         user_email: 'fengzetao.zed@foxmail.com'
         user_name: 'jujimeizuo'
