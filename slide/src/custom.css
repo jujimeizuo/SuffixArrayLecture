@@ -252,11 +252,21 @@ html.print-pdf .reveal pre code {
 }
 
 .reveal code[class*=lcp] {
-  line-height: 18px;
-  font-size: 14px;
+  line-height: 16px;
+  font-size: 13px;
 }
 
 .reveal code[class*=lcs] {
-  line-height: 25px;
+  line-height: 23px;
   font-size: 18px;
+}
+
+.reveal code[class*=height_case] {
+  line-height: 24px;
+  font-size: 15px;
+}
+
+.lcs_font li {
+  /* line-height: 21px; */
+  font-size: 16px;
 }

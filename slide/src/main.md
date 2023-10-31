@@ -49,12 +49,25 @@ By 冯则涛、张帅宇、李伟、杨子伦、杨康
 <!--s-->
 <!-- .slide: data-background="images/background.png" -->
 
+<div class="middle center">
+<div style="width: 100%">
+
+# Part.1 后缀数组 SA
+
+</div>
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
 ## 后缀数组 SA
 
 - 后缀数组：字符串的所有后缀按字典序排序后的数组，简称 SA 数组
 - SA[i]：表示排序为 i 的后缀编号
 - rank[i]：表示后缀 i 的排名
 - 定义一个字符串 S = "aabaaaab"
+
+<div class="fragment">
 
 <div class="mul-cols">
 <div class="col">
@@ -75,24 +88,49 @@ By 冯则涛、张帅宇、李伟、杨子伦、杨康
 
 <div class="col">
 
-| sa[i] | rank[i] | suffix[i] |
-| :---: | :-----: | --------- |
-|   4   |    1    | aaaab     |
-|   5   |    2    | aaab      |
-|   6   |    3    | aab       |
-|   1   |    4    | aabaaaab  |
-|   7   |    5    | ab        |
-|   2   |    6    | abaaaab   |
-|   8   |    7    | b         |
-|   3   |    8    | baaaab    |
+| i   | suffix[i] |
+| --- | --------- |
+| 4   | aaaab     |
+| 5   | aaab      |
+| 6   | aab       |
+| 1   | aabaaaab  |
+| 7   | ab        |
+| 2   | abaaaab   |
+| 8   | b         |
+| 3   | baaaab    |
+
+</div>
+
+<div class="col">
+
+| i   | sa[i] | rank[i] |
+| --- | :---: | :-----: |
+| 1   |   4   |    4    |
+| 2   |   5   |    6    |
+| 3   |   6   |    8    |
+| 4   |   1   |    1    |
+| 5   |   7   |    2    |
+| 6   |   2   |    3    |
+| 7   |   8   |    6    |
+| 8   |   3   |    7    |
+
+
+</div>
+
 
 </div>
 
 </div>
 
+<div class="fragment">
+
+<div style="color: red">
 <center>
 rank[sa[i]] = sa[rank[i]] = i
 </center>
+</div>
+
+</div>
 
 <!--v-->
 <!-- .slide: data-background="images/background.png" -->
@@ -117,7 +155,11 @@ std::vector<int> suffix_array(const std::string& s) {
 }
 ```
 
+<div class="fragment">
+
 - 时间复杂度为 $O(n^2 \log n)$
+
+</div>
 
 <!--v-->
 <!-- .slide: data-background="images/background.png" -->
@@ -159,172 +201,224 @@ std::vector<int> suffix_array(const std::string& s) {
 
 ## 后缀数组 SA ——
 
-<!--v-->
-
-## Code
-
-```cpp {.sa1}
-template <typename T>
-std::vector<int> suffix_array(int n, const T &s, int char_bound) {
-    std::vector<int> a(n);
-    if (n == 0) {
-        return a;
-    }
-    if (char_bound != -1) {
-        std::vector<int> aux(char_bound, 0);
-        for (int i = 0; i < n; i++) {
-            aux[s[i]]++;
-        }
-        int sum = 0;
-        for (int i = 0; i < char_bound; i++) {
-            int add = aux[i];
-            aux[i] = sum;
-            sum += add;
-        }
-        for (int i = 0; i < n; i++) {
-            a[aux[s[i]]++] = i;
-        }
-    } else {
-        iota(a.begin(), a.end(), 0);
-        sort(a.begin(), a.end(), [&s](int i, int j) { return s[i] < s[j]; });
-    }
-    ...
-```
-
-<!--v-->
-
-## Code
-
-```cpp {.sa2}
-template <typename T>
-std::vector<int> suffix_array(int n, const T &s, int char_bound) {
-    ...
-    std::vector<int> sorted_by_second(n);
-    std::vector<int> ptr_group(n);
-    std::vector<int> new_group(n);
-    std::vector<int> group(n);
-    group[a[0]] = 0;
-    for (int i = 1; i < n; i++) {
-        group[a[i]] = group[a[i - 1]] + (!(s[a[i]] == s[a[i - 1]]));
-    }
-    ...
-}
-```
-
-<!--v-->
-
-## Code
-
-```cpp {.sa3}
-template <typename T>
-std::vector<int> suffix_array(int n, const T &s, int char_bound) {
-    ...
-    int cnt = group[a[n - 1]] + 1;
-    int step = 1;
-    while (cnt < n) {
-        int at = 0;
-        for (int i = n - step; i < n; i++) {
-            sorted_by_second[at++] = i;
-        }
-        for (int i = 0; i < n; i++) {
-            if (a[i] - step >= 0) {
-                sorted_by_second[at++] = a[i] - step;
-            }
-        }
-        for (int i = n - 1; i >= 0; i--) {
-            ptr_group[group[a[i]]] = i;
-        }
-        for (int i = 0; i < n; i++) {
-            int x = sorted_by_second[i];
-            a[ptr_group[group[x]]++] = x;
-        }
-        new_group[a[0]] = 0;
-        for (int i = 1; i < n; i++) {
-            if (group[a[i]] != group[a[i - 1]]) {
-                new_group[a[i]] = new_group[a[i - 1]] + 1;
-            } else {
-                int pre = (a[i - 1] + step >= n ? -1 : group[a[i - 1] + step]);
-                int cur = (a[i] + step >= n ? -1 : group[a[i] + step]);
-                new_group[a[i]] = new_group[a[i - 1]] + (pre != cur);
-            }
-        }
-        swap(group, new_group);
-        cnt = group[a[n - 1]] + 1;
-        step <<= 1;
-    }
-    return a;
-}
-```
-
-<!--v-->
-
-## Code
-
-```cpp {.sa4}
-template <typename T>
-std::vector<int> suffix_array(const T &s, int char_bound) {
-    return suffix_array((int) s.size(), s, char_bound);
-}
-```
 
 
 <!--s-->
+<!-- .slide: data-background="images/background.png" -->
+
+<div class="middle center">
+<div style="width: 100%">
+
+# Part.2 最长公共前缀 LCP
+
+</div>
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
 
 ## 最长公共前缀 LCP
 
-<!--v-->
+<div class="fragment">
 
-## Code
+- 最长公共前缀："<u>aaa</u>b" 和 "<u>aaa</u>aaab" 的最长公共前缀为 "aaa"
+
+</div>
+
+<div class="fragment">
+
+- 定义高度数组 height[i] = lcp(sa[i], sa[i-1])，即第 i 名的后缀 和第 i-1 名的后缀的最长公共前缀的长度
+
+</div>
+
+<div class="fragment">
+
+- 后缀 i 的前邻后缀一定是 sa[rank[i]-1]
+    - 因为 i=sa[rank[i]], i 的排名为 rank[i]，排名减 1 取 sa 即得。
+
+</div>
+
+<div class="fragment">
+
+- 高度数组的作用：
+    - 高度数组表示两个后缀的相似度
+    - 排序相邻的两个后缀相似度最高
+
+</div>
+
+<div class="fragment">
+
+- 暴力求解：将相邻的后缀进行 lcp 匹配，复杂度 $\mathcal{O}(n^2)$
+
+</div>
+
+<div class="fragment">
+
+- 定理：
+
+<center>
+
+<div style="color: red">
+
+height[rank[i]]>=height[rank[i]-1]-1
+
+</center>
+
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 最长公共前缀 LCP - Code
 
 ```cpp .{lcp}
 template <typename T>
 std::vector<int> build_lcp(int n, const T &s, const std::vector<int> &sa) {
     assert((int) sa.size() == n);
-    std::vector<int> pos(n);
+    std::vector<int> rank(n);
     for (int i = 0; i < n; i++) {
-        pos[sa[i]] = i;
+        rank[sa[i]] = i;
     }
-    std::vector<int> lcp(std::max(n - 1, 0));
-    int k = 0;
-    for (int i = 0; i < n; i++) {
-        k = std::max(k - 1, 0);
-        if (pos[i] == n - 1) {
-            k = 0;
-        } else {
-            int j = sa[pos[i] + 1];
-            while (i + k < n && j + k < n && s[i + k] == s[j + k]) {
-                k++;
-            }
-            lcp[pos[i]] = k;
+    std::vector<int> height(std::max(n - 1, 0));
+    for (int i = 0, k = 0; i < n; i++) {
+        if (rank[i] == 0) { // 第一名 height 为 0
+            continue;
         }
+        k = std::max(k - 1, 0); // 上一个后缀的 height 值减 1
+        int j = sa[rank[i] - 1]; // 找出后缀 i 的前邻后缀 j
+        while (i + k < n && j + k < n && s[i + k] == s[j + k]) {
+            k++;
+        }
+        height[rank[i]] = k;
     }
-    return lcp;
+    return height;
 }
  
 template <typename T>
 std::vector<int> build_lcp(const T &s, const std::vector<int> &sa) {
-    return build_lcp((int) s.size(), s, sa);
+    return build_height((int) s.size(), s, sa);
 }
 ```
 
+<div class="fragment">
+
+- k++ 总共不超过 n 次，k-- 总共不超过 n 次，所以最多跑 2n 次，复杂为 $\mathcal{O}(n)$
+
+</div>
+
 <!--s-->
+<!-- .slide: data-background="images/background.png" -->
+
+<div class="middle center">
+<div style="width: 100%">
+
+# Part.3 最长公共子串 LCS
+
+</div>
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
 
 ## 最长公共子串 LCS
 
-<!--v-->
+- 最长公共子串："aa<u>aba</u>" 和 "<u>aba</u>a" 的最长公共子串为 "aba"
 
-## Code
+<div class="fragment">
+
+- 那么和后缀和最长公共前缀有什么联系呢？
+
+</div>
+
+<div class="fragment">
+
+- 字符串的任何一个子串都是其某个后缀的前缀，求两个字符串的最长公共子串就是求两个字符串的后缀的最长公共前缀。
+
+</div>
+
+<div class="fragment">
+
+- 暴力求解：如果枚举两个字符串的后缀，复杂度为 $\mathcal{O}(n^2)$
+
+</div>
+
+<div class="fragment">
+
+- 我们可以将一个字符串并在另一个字符串后面，中间用一个没有出现过的字符隔开，再求新字符串的后缀数组
+
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 最长公共子串 LCS
+
+- 例如 S = "aaaba" + "$" + "abaa"
+
+<div class="fragment">
+
+<div class="mul-cols">
+
+<div class="lcs_font">
+<div class="col">
+
+- 因为最长公共子串为A和B的后缀的最长公共前缀，所以最长公共子串的长度就是满足条件的height值中的最大值
+- 可取的height满足的条件？
+    - 如果两个后缀在原来的同一个字符串中，则不能满足条件
+    - 所以要保证suffix[sa[i-1]]和suffix[sa[i]]不是同一个字符串的两个后缀
+    - 
+    ```c++ .{height_case}
+(sa[i - 1] < n and sa[i] > n)
+(sa[i] < n and sa[i - 1] > n)
+    ```
+
+</div>
+
+</div>
+
+
+<div class="col">
+
+| height | suffix     |
+| ------ | ---------- |
+|        | $abaa      |
+|        | a          |
+| 1      | a$abaa     |
+| 1      | aa         |
+| 2      | aaaba$abaa |
+|        | aaba$abaa  |
+|        | aba$abaa   |
+| 3      | abaa       |
+| 0      | ba$abaa    |
+| 2      | baa        |
+
+</div>
+
+</div>
+
+</div>
+
+<div class="fragment">
+
+- 只需要遍历sa，时间复杂度为 $\mathcal{O}(n+m)$
+
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 最长公共子串 LCS - Code
 
 ```cpp {.lcs}
 template <typename T>
 int lcs(const T& s, const T& t) {
     int n = (int) s.size(), m = (int) t.size();
     std::string st = s + "*" + t;
-    std::vector<int> sa = suffix_array(st, 256);
+    std::vector<int> sa = suffix_array(st);
     std::vector<int> lcp = build_lcp(st, sa);
 
     int lcs_length = 0;
-    for (int i = 1; i < n; i += 1) {
+    for (int i = 1; i < n + m; i += 1) {
         if (lcp[i] > lcs_length) {
             if (sa[i - 1] < n and sa[i] > n) {
                 lcs_length = std::max(lcs_length, lcp[i]);
@@ -349,7 +443,7 @@ int lcs(const T& s, const T& t) {
 
 ## Reference
 
-- [后缀数组详解](https://blog.csdn.net/tanjunming2020/article/details/126274419)
+- [后缀数组详解](https://zhuanlan.zhihu.com/p/561024497)
 - [OI Wiki 后缀数组简介](https://oi-wiki.org/string/sa/)
 - [[2009] 后缀数组——处理字符串的有力工具 by. 罗穗骞](https://wenku.baidu.com/view/5b886b1ea76e58fafab00374.html?_wkts_=1698594992342&needWelcomeRecommand=1)
 - [P3809 【模板】后缀排序](https://www.luogu.com.cn/record/85567716)
