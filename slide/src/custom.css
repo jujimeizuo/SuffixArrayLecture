@@ -231,24 +231,29 @@ html.print-pdf .reveal pre code {
   font-size: 1em;
 }
 
-.reveal code[class*=sa1] {
-  line-height: 21px;
-  font-size: 17px;
+.reveal code[class*=sa_step1] {
+  line-height: 20px;
+  font-size: 16px;
 }
 
-.reveal code[class*=sa2] {
-  line-height: 28px;
-  font-size: 20px;
+.reveal code[class*=sa_step2] {
+  line-height: 20px;
+  font-size: 16px;
 }
 
-.reveal code[class*=sa3] {
-  line-height: 14px;
-  font-size: 12px;
+.reveal code[class*=sa_step3] {
+  line-height: 20px;
+  font-size: 16px;
 }
 
-.reveal code[class*=sa4] {
-  line-height: 28px;
-  font-size: 20px;
+.reveal code[class*=sa_step4] {
+  line-height: 22px;
+  font-size: 15px;
+}
+
+.reveal code[class*=sa_step_end] {
+  line-height: 10px;
+  font-size: 8px;
 }
 
 .reveal code[class*=lcp] {

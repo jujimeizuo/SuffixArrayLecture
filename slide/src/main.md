@@ -166,11 +166,29 @@ std::vector<int> suffix_array(const std::string& s) {
 
 ## 后缀数组 SA —— 倍增法 + 基数排序
 
-- 用倍增的方法对每个字符开始的长度为 $2^k$ 的子字符串进行排序，求出排名 rank 值
-- k 从 0 开始，每次加 1，当 $2^k$ 大于 n 后，每个字符开始的长度为 $2^k$ 的子字符串相当于所有的后缀，并且这些子字符串都已经排好序，即 rank 值没有相同的值，此时 rank 就是最终结果
-- 每一次排序都利用上次长度为 $2^{k-1}$ 的子字符串的 rank 值，那么长度为 $2^k$ 的子字符串就可以用两个长度为 $2^{k-1}$的子字符串的排名作为关键字表示，然后进行**基数排序**，便可得出长度为 $2^k$ 的子字符串的 rank 值
+<div class="fragment">
+
+- 用倍增的方法对每个字符开始的长度为$2^k$的子字符串进行排序，求出排名rank值
+
+</div>
+
+<div class="fragment">
+
+- k从0开始，每次加1，当$2^k$大于n后，每个字符开始的长度为$2^k$的子字符串相当于所有的后缀，并且这些子字符串都已经排好序，即rank值没有相同的值，此时rank就是最终结果
+
+</div>
+
+<div class="fragment">
+
+- 每一次排序都利用上次长度为 $2^{k-1}$ 的子字符串的 rank 值，那么长度为 $2^k$ 的子字符串就可以用两个长度为 $2^{k-1}$的子字符串的排名作为关键字表示，然后**基数排序**，便可得出长度为 $2^k$ 的子字符串的 rank 值
+
+</div>
+
+<div class="fragment">
 
 - 以 s = "aabaaaab" 为例，令 x、y 表示长度为 $2^k$ 的字符串的两个关键字
+
+</div>
 
 <!--v-->
 
@@ -183,23 +201,187 @@ std::vector<int> suffix_array(const std::string& s) {
 </center>
 
 
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 后缀数组 SA —— 倍增法 + 基数排序
+
+- 第一步：要对长度为1的字符串进行排序，即对每个字符进行排序，得到长度为1的字符串的rank值
+
+<div class="fragment">
+
+```c++ {.sa_step1}
+std::vector<int> x(n), y(n); // x[i] 表示第一关键字，y[i] 表示第二关键字
+std::vector<int> cnt(std::max(char_bound, n), 0); // 计数排序辅助数组
+for (int i = 0; i < n; i += 1) cnt[x[i] = s[i]]++;
+for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[s[i]]] = i;
+```
+
+</div>
+
+<div class="fragment">
+
+| i   | s[i]             | x[i]  |           |           |         |     | i   | suffix   |
+| --- | :--------------- | :---: | --------- | --------- | ------- | --- | --- | -------- |
+| 0   | <u> a</u>abaaaab |  97   | cnt[97]=1 |           | sa[7]=7 |     | 0   | aabaaaab |
+| 1   | <u> a</u>baaaab  |  97   | cnt[97]=2 |           | sa[5]=6 |     | 1   | abaaaab  |
+| 2   | <u>  b</u>aaaab  |  98   | cnt[98]=1 |           | sa[4]=5 |     | 3   | aaaab    |
+| 3   | <u>  a</u>aaab   |  97   | cnt[97]=3 |           | sa[3]=4 |     | 4   | aaab     |
+| 4   | <u>  a</u>aab    |  97   | cnt[97]=4 |           | sa[2]=3 |     | 5   | aab      |
+| 5   | <u>   a</u>ab    |  97   | cnt[97]=5 |           | sa[6]=2 |     | 6   | ab       |
+| 6   | <u>   a</u>b     |  97   | cnt[97]=6 | cnt[97]=6 | sa[1]=1 |     | 2   | baaaab   |
+| 7   | <u>    b</u>     |  98   | cnt[98]=2 | cnt[98]=8 | sa[0]=0 |     | 7   | b        |
+
+</div>
 
 
 
 <!--v-->
 <!-- .slide: data-background="images/background.png" -->
 
-## 后缀数组 SA ——
+## 后缀数组 SA —— 倍增法 + 基数排序
+
+- 第二步：倍增，进行若干次基数排序，并计算出新的 rank 值
+- 基数排序分两次，第一次是对第二关键字排序，第二次是对第一关键字排序。
+
+```c++
+for (int step = 1; step <= n; step <<= 1) {
+    // 对第二关键字排序
+    ...
+    // 对第一关键字排序
+    ...
+    // 求出新的计算 rank 值
+    ...
+}
+```
+
 
 <!--v-->
 <!-- .slide: data-background="images/background.png" -->
 
-## 后缀数组 SA ——
+## 后缀数组 SA —— 倍增法 + 基数排序
+
+- 通过计数排序先对第二关键字排序，保存到y数组中
+
+<div class="fragment">
+
+- 思考一下第二关键字排序的实质，其实就是把超出字符串范围（即sa[i]+step>=n的sa[i]放到sa数组头部，然后把剩下的依原顺序放入：
+
+```c++ {.sa_step2}
+int at = 0;
+for (int i = n - step; i < n; i += 1) y[at++] = i;
+for (int i = 0; i < n; i += 1) {
+    if (sa[i] - step >= 0) {
+        y[at++] = sa[i] - step;
+    }
+}
+```
+
+</div>
+
+<div class="fragment">
+
+- 通过计数排序对第一关键字排序，求出新的sa值
+
+```c++ {.sa_step3}
+std::fill(cnt.begin(), cnt.end(), 0);
+for (int i = 0; i < n; i += 1) cnt[x[y[i]]] += 1;
+for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[x[y[i]]]] = y[i];
+```
+
+</div>
 
 <!--v-->
 <!-- .slide: data-background="images/background.png" -->
 
-## 后缀数组 SA ——
+## 后缀数组 SA —— 倍增法 + 基数排序
+
+- 求出sa之后，下一步是计算rank值。因为sa数组已经是按照第二关键字排序好的，所以只需要对相邻的两个后缀进行比较，如果相同则rank值相同，否则rank值加1
+
+<div class="fragment">
+
+```c++ {.sa_step4}
+std::vector<int> new_x(n);
+new_x[sa[0]] = 0;
+for (int i = 1; i < n; i += 1) {
+    if (x[sa[i]] != x[sa[i - 1]]) {
+        new_x[sa[i]] = new_x[sa[i - 1]] + 1;
+    } else {
+        int pre = (sa[i - 1] + step >= n ? -1 : x[sa[i - 1] + step]);
+        int cur = (sa[i] + step >= n ? -1 : x[sa[i] + step]);
+        new_x[sa[i]] = new_x[sa[i - 1]] + (pre != cur);
+    }
+}
+std::swap(x, new_x);
+char_bound = x[sa[n - 1]] + 1;
+if (char_bound == n) {
+    break;
+}
+```
+
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 后缀数组 SA —— 倍增法 + 基数排序
+
+```c++ {.sa_step_end}
+template <typename T>
+std::vector<int> suffix_array(int n, const T &s, int char_bound = 256) {
+    std::vector<int> sa(n);
+    std::vector<int> x(n), y(n), new_x(n);
+    std::vector<int> cnt(std::max(n, char_bound), 0);
+    for (int i = 0; i < n; i += 1) cnt[x[i] = s[i]] += 1;
+    for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+    for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[x[i]]] = i;
+
+    for (int step = 1; step <= n; step <<= 1) {
+        int at = 0;
+        for (int i = n - step; i < n; i += 1) y[at++] = i;
+        for (int i = 0; i < n; i += 1) {
+            if (sa[i] - step >= 0) {
+                y[at++] = sa[i] - step;
+            }
+        }
+
+        std::fill(cnt.begin(), cnt.end(), 0);
+        for (int i = 0; i < n; i += 1) cnt[x[y[i]]] += 1;
+        for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+        for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[x[y[i]]]] = y[i];
+
+        new_x[sa[0]] = 0;
+        for (int i = 1; i < n; i += 1) {
+            if (x[sa[i]] != x[sa[i - 1]]) {
+                new_x[sa[i]] = new_x[sa[i - 1]] + 1;
+            } else {
+                int pre = (sa[i - 1] + step >= n ? -1 : x[sa[i - 1] + step]);
+                int cur = (sa[i] + step >= n ? -1 : x[sa[i] + step]);
+                new_x[sa[i]] = new_x[sa[i - 1]] + (pre != cur);
+            }
+        }
+        std::swap(x, new_x);
+        char_bound = x[sa[n - 1]] + 1;
+        if (char_bound == n) {
+            break;
+        }
+    }
+    return sa;
+}
+```
+
+<div class="fragment">
+
+- 时间复杂度：$\mathcal{O}(n \log n)$
+
+</div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 后缀数组 SA —— DC3分治法
 
 
 
@@ -269,7 +451,7 @@ height[rank[i]]>=height[rank[i]-1]-1
 <!--v-->
 <!-- .slide: data-background="images/background.png" -->
 
-## 最长公共前缀 LCP - Code
+## 最长公共前缀 LCP
 
 ```cpp .{lcp}
 template <typename T>
@@ -305,6 +487,25 @@ std::vector<int> build_lcp(const T &s, const std::vector<int> &sa) {
 - k++ 总共不超过 n 次，k-- 总共不超过 n 次，所以最多跑 2n 次，复杂为 $\mathcal{O}(n)$
 
 </div>
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 最长公共扩展 LCE
+
+- 最长公共扩展对于一个字符串的两个后缀最长前缀长度，例如s="aabaaaab"
+    - suffix[0] = aabaaaab
+    - suffix[3] = aaaab
+    - 则 suffix[0] 和 suffix[3] 的最长公共扩展为 "aa"，lce(0,3)=2
+- lce(l,r)具有一下性质
+
+$$
+lce(l,r)=\underset{x<y<z}{\min}(lce(sa[y], sa[y+1]))=\underset{x<y<z}{\min} (lcp[y])
+$$
+
+- 由上式可知，最长公共扩展问题转换为对于最长公共前缀数组的区间最小查询问题，即 LCP + RMQ
+- 时间复杂度：$\mathcal{O}(n \log n)$
+
 
 <!--s-->
 <!-- .slide: data-background="images/background.png" -->
@@ -407,7 +608,7 @@ std::vector<int> build_lcp(const T &s, const std::vector<int> &sa) {
 <!--v-->
 <!-- .slide: data-background="images/background.png" -->
 
-## 最长公共子串 LCS - Code
+## 最长公共子串 LCS
 
 ```cpp {.lcs}
 template <typename T>
@@ -437,11 +638,18 @@ int lcs(const T& s, const T& t) {
 <!--s-->
 
 ## 扩展
+<!-- .slide: data-background="images/background.png" -->
+
+- 最长重复子串
+- 多个串的最长公共子串
+- 不同子串个数
+- ...
 
 <!--s-->
 
 
 ## Reference
+<!-- .slide: data-background="images/background.png" -->
 
 - [后缀数组详解](https://zhuanlan.zhihu.com/p/561024497)
 - [OI Wiki 后缀数组简介](https://oi-wiki.org/string/sa/)
