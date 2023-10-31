@@ -256,6 +256,27 @@ html.print-pdf .reveal pre code {
   font-size: 8px;
 }
 
+.reveal code[class*=dc3_small] {
+  line-height: 24px;
+  font-size: 14px;
+}
+
+.reveal code[class*=dc3_step1] {
+  line-height: 20px;
+  font-size: 16px;
+}
+
+.reveal code[class*=dc3_step2] {
+  line-height: 30px;
+  font-size: 20px;
+}
+
+.reveal code[class*=dc3_step3] {
+  line-height: 17px;
+  font-size: 13px;
+}
+
+
 .reveal code[class*=lcp] {
   line-height: 16px;
   font-size: 13px;

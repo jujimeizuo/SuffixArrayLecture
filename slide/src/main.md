@@ -383,6 +383,30 @@ std::vector<int> suffix_array(int n, const T &s, int char_bound = 256) {
 
 ## 后缀数组 SA —— DC3分治法
 
+1. 把所有的后缀分成两部分，记后缀起始的下标为 i，第一部分为 i mod 3 = 0 的后缀（以下称为 A 类后缀），第二部分为  i mod 3 ≠ 0 的后缀（以下称为 B 类后缀）。
+2. 利用基数排序，对所有 B 类后缀按照前三个字符排序。
+3. 如果前三个字符无法将所有 B 类后缀排好序，把每三个相邻的字符看作一个字符，构造新的字符串，递归对 B 类后缀排序。
+4. 利用 B 类后缀的顺序可以利用基数排序很快的求出 A 类后缀的顺序。
+5. 对 A 类后缀和 B 类后缀进行归并排序，然后 SA 数组就求出来了。
+
+
+<!--v-->
+<!-- .slide: data-background="images/background.png" -->
+
+## 倍增法 VS DC3分治法
+
+<div class="mul-cols">
+<div class="col">
+
+|            | DC3分治法                      | 倍增法                            |
+| ---------- | ------------------------------ | --------------------------------- |
+| 时间复杂度 | $\mathcal{O}(n)$(但是常数很大) | $\mathcal{O}(n \log n)$(常数较小) |
+| 空间复杂度 | $\mathcal{O}(n)$               | $\mathcal{O}(n)$                  |
+| 编程复杂度 | 较高                           | 较低                              |
+
+</div>
+
+</div>
 
 
 <!--s-->
@@ -643,6 +667,7 @@ int lcs(const T& s, const T& t) {
 - 最长重复子串
 - 多个串的最长公共子串
 - 不同子串个数
+- 结合其他数据结构
 - ...
 
 <!--s-->
@@ -653,6 +678,7 @@ int lcs(const T& s, const T& t) {
 
 - [后缀数组详解](https://zhuanlan.zhihu.com/p/561024497)
 - [OI Wiki 后缀数组简介](https://oi-wiki.org/string/sa/)
+- [后缀数组 DC3构造法 —— 详解](https://www.cnblogs.com/alihenaixiao/p/4795785.html)
 - [[2009] 后缀数组——处理字符串的有力工具 by. 罗穗骞](https://wenku.baidu.com/view/5b886b1ea76e58fafab00374.html?_wkts_=1698594992342&needWelcomeRecommand=1)
 - [P3809 【模板】后缀排序](https://www.luogu.com.cn/record/85567716)
 - [POJ 2774 -- Long Long Message](https://security.feishu.cn/link/safety?target=http%3A%2F%2Fpoj.org%2Fproblem%3Fid%3D2774&scene=ccm&logParams=%7B%22location%22%3A%22ccm_docs%22%7D&lang=zh-CN)
