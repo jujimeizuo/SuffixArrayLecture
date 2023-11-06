@@ -212,9 +212,9 @@ std::vector<int> suffix_array(const std::string& s) {
 
 ```c++ {.sa_step1}
 std::vector<int> x(n), y(n); // x[i] 表示第一关键字，y[i] 表示第二关键字
-std::vector<int> cnt(std::max(char_bound, n), 0); // 计数排序辅助数组
+std::vector<int> cnt(std::max(m, n), 0); // 计数排序辅助数组
 for (int i = 0; i < n; i += 1) cnt[x[i] = s[i]]++;
-for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+for (int i = 1; i < m; i += 1) cnt[i] += cnt[i - 1];
 for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[s[i]]] = i;
 ```
 
@@ -287,7 +287,7 @@ for (int i = 0; i < n; i += 1) {
 ```c++ {.sa_step3}
 std::fill(cnt.begin(), cnt.end(), 0);
 for (int i = 0; i < n; i += 1) cnt[x[y[i]]] += 1;
-for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+for (int i = 1; i < m; i += 1) cnt[i] += cnt[i - 1];
 for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[x[y[i]]]] = y[i];
 ```
 
@@ -315,8 +315,8 @@ for (int i = 1; i < n; i += 1) {
     }
 }
 std::swap(x, new_x);
-char_bound = x[sa[n - 1]] + 1;
-if (char_bound == n) {
+m = x[sa[n - 1]] + 1;
+if (m == n) {
     break;
 }
 ```
@@ -330,12 +330,12 @@ if (char_bound == n) {
 
 ```c++ {.sa_step_end}
 template <typename T>
-std::vector<int> suffix_array(int n, const T &s, int char_bound = 256) {
+std::vector<int> suffix_array(int n, const T &s, int m = 256) {
     std::vector<int> sa(n);
     std::vector<int> x(n), y(n), new_x(n);
-    std::vector<int> cnt(std::max(n, char_bound), 0);
+    std::vector<int> cnt(std::max(n, m), 0);
     for (int i = 0; i < n; i += 1) cnt[x[i] = s[i]] += 1;
-    for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+    for (int i = 1; i < m; i += 1) cnt[i] += cnt[i - 1];
     for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[x[i]]] = i;
 
     for (int step = 1; step <= n; step <<= 1) {
@@ -349,7 +349,7 @@ std::vector<int> suffix_array(int n, const T &s, int char_bound = 256) {
 
         std::fill(cnt.begin(), cnt.end(), 0);
         for (int i = 0; i < n; i += 1) cnt[x[y[i]]] += 1;
-        for (int i = 1; i < char_bound; i += 1) cnt[i] += cnt[i - 1];
+        for (int i = 1; i < m; i += 1) cnt[i] += cnt[i - 1];
         for (int i = n - 1; i >= 0; i -= 1) sa[--cnt[x[y[i]]]] = y[i];
 
         new_x[sa[0]] = 0;
@@ -363,8 +363,8 @@ std::vector<int> suffix_array(int n, const T &s, int char_bound = 256) {
             }
         }
         std::swap(x, new_x);
-        char_bound = x[sa[n - 1]] + 1;
-        if (char_bound == n) {
+        m = x[sa[n - 1]] + 1;
+        if (m == n) {
             break;
         }
     }
@@ -502,7 +502,7 @@ std::vector<int> build_lcp(int n, const T &s, const std::vector<int> &sa) {
  
 template <typename T>
 std::vector<int> build_lcp(const T &s, const std::vector<int> &sa) {
-    return build_height((int) s.size(), s, sa);
+    return build_lcp((int) s.size(), s, sa);
 }
 ```
 
@@ -635,21 +635,20 @@ $$
 ## 最长公共子串 LCS
 
 ```cpp {.lcs}
-template <typename T>
-int lcs(const T& s, const T& t) {
+int lcs(const std::string& s, const std::string& t) {
     int n = (int) s.size(), m = (int) t.size();
     std::string st = s + "*" + t;
     std::vector<int> sa = suffix_array(st);
-    std::vector<int> lcp = build_lcp(st, sa);
+    std::vector<int> height = build_lcp(st, sa);
 
     int lcs_length = 0;
     for (int i = 1; i < n + m; i += 1) {
-        if (lcp[i] > lcs_length) {
+        if (height[i] > lcs_length) {
             if (sa[i - 1] < n and sa[i] > n) {
-                lcs_length = std::max(lcs_length, lcp[i]);
+                lcs_length = std::max(lcs_length, height[i]);
             }
             if (sa[i] < n and sa[i - 1] > n) {
-                lcs_length = std::max(lcs_length, lcp[i]);
+                lcs_length = std::max(lcs_length, height[i]);
             }
         }
     }
@@ -664,9 +663,14 @@ int lcs(const T& s, const T& t) {
 ## 扩展
 <!-- .slide: data-background="images/background.png" -->
 
-- 最长重复子串
+- 可重叠最长重复子串
+    - height 数组中的最大值
+- 不可重叠最长重复子串
+    1. 首先二分答案 x，对 height 数组进行分组，保证每一组的 mid height 值都大于等于 x
+    2. 依次枚举每一组，记录最大和最小长度，多 sa[mx]-sa[mi] >= x 就可以更新答案
+- 本质不同子串个数
+    - 枚举每一个后缀，第i个后缀对答案的贡献为len-sa[i]+1-height[i]
 - 多个串的最长公共子串
-- 不同子串个数
 - 结合其他数据结构
 - ...
 
@@ -678,7 +682,7 @@ int lcs(const T& s, const T& t) {
 
 - [后缀数组详解](https://zhuanlan.zhihu.com/p/561024497)
 - [OI Wiki 后缀数组简介](https://oi-wiki.org/string/sa/)
-- [后缀数组 DC3构造法 —— 详解](https://www.cnblogs.com/alihenaixiao/p/4795785.html)
+- [ DC3算法构造后缀数组](https://www.luogu.com.cn/blog/nederland/solution-p3809)
 - [[2009] 后缀数组——处理字符串的有力工具 by. 罗穗骞](https://wenku.baidu.com/view/5b886b1ea76e58fafab00374.html?_wkts_=1698594992342&needWelcomeRecommand=1)
 - [P3809 【模板】后缀排序](https://www.luogu.com.cn/record/85567716)
 - [POJ 2774 -- Long Long Message](https://security.feishu.cn/link/safety?target=http%3A%2F%2Fpoj.org%2Fproblem%3Fid%3D2774&scene=ccm&logParams=%7B%22location%22%3A%22ccm_docs%22%7D&lang=zh-CN)

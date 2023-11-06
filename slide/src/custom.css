@@ -252,7 +252,7 @@ html.print-pdf .reveal pre code {
 }
 
 .reveal code[class*=sa_step_end] {
-  line-height: 10px;
+  line-height: 11px;
   font-size: 8px;
 }
 
